@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroPrep - Medical Study App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 4px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--white);
+            box-shadow: 2px 0 4px var(--shadow);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .system-list {
+            padding: 1rem;
+        }
+
+        .system-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .system-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .system-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .system-item:hover {
+            background: var(--light);
+        }
+
+        .system-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .system-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.7;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 3D Viewer */
+        .viewer-container {
+            flex: 1;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        #anatomyViewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .viewer-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 0.5rem;
+            background: var(--light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            width: 350px;
+            background: var(--white);
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            padding: 1.5rem;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .info-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 0.5rem;
+            background: var(--light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .info-content {
+            line-height: 1.6;
+        }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .info-section p {
+            color: #4b5563;
+        }
+
+        /* Study Tools */
+        .study-tools {
+            background: var(--white);
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-card {
+            background: var(--light);
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .tool-card:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Flashcard */
+        .flashcard {
+            background: var(--light);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Quiz */
+        .quiz-question {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--danger);
+            background: #fee2e2;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .info-panel {
+                width: 90%;
+                right: 5%;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <span>🧠</span>
+                <span>NeuroPrep</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Study</a>
+                <a href="#" class="nav-link">Progress</a>
+                <a href="#" class="nav-link">Resources</a>
+                <a href="#" class="btn btn-primary">Premium</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <input type="search" class="search-box" placeholder="Search anatomy...">
+            </div>
+            <div class="system-list">
+                <div class="system-category">
+                    <div class="system-title">Body Systems</div>
+                    <div class="system-item active" onclick="loadSystem('brain')">
+                        <span class="system-icon">🧠</span>
+                        <span>Nervous System</span>
+                    </div>
+                    <div class="system-item" onclick="loadSystem('heart')">
+                        <span class="system-icon">❤️</span>
+                        <span>Cardiovascular</span>
+                    </div>
+                    <div class="system-item" onclick="loadSystem('lungs')">
+                        <span class="system-icon">🫁</span>
+                        <span>Respiratory</span>
+                    </div>
+                    <div class="system-item" onclick="loadSystem('skeleton')">
+                        <span class="system-icon">🦴</span>
+                        <span>Skeletal</span>
+                    </div>
+                    <div class="system-item" onclick="loadSystem('muscles')">
+                        <span class="system-icon">💪</span>
+                        <span>Muscular</span>
+                    </div>
+                </div>
+                <div class="system-category">
+                    <div class="system-title">MCAT Topics</div>
+                    <div class="system-item">
+                        <span class="system-icon">🧬</span>
+                        <span>Biochemistry</span>
+                    </div>
+                    <div class="system-item">
+                        <span class="system-icon">⚗️</span>
+                        <span>Organic Chemistry</span>
+                    </div>
+                    <div class="system-item">
+                        <span class="system-icon">⚛️</span>
+                        <span>Physics</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- 3D Viewer -->
+            <div class="viewer-container">
+                <canvas id="anatomyViewer"></canvas>
+                
+                <!-- Viewer Controls -->
+                <div class="viewer-controls">
+                    <button class="control-btn" onclick="resetView()">🏠</button>
+                    <button class="control-btn" onclick="toggleRotation()">🔄</button>
+                    <button class="control-btn" onclick="toggleLayers()">🧅</button>
+                    <button class="control-btn" onclick="crossSection()">✂️</button>
+                    <button class="control-btn" onclick="toggleLabels()">🏷️</button>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="info-panel" id="infoPanel">
+                    <div class="info-header">
+                        <h2 class="info-title">Brain Anatomy</h2>
+                        <button class="close-btn" onclick="closeInfo()">✕</button>
+                    </div>
+                    
+                    <div class="info-tabs">
+                        <button class="tab active" onclick="switchTab('overview')">Overview</button>
+                        <button class="tab" onclick="switchTab('structure')">Structure</button>
+                        <button class="tab" onclick="switchTab('function')">Function</button>
+                        <button class="tab" onclick="switchTab('clinical')">Clinical</button>
+                    </div>
+                    
+                    <div class="info-content" id="infoContent">
+                        <div class="info-section">
+                            <h3>Central Nervous System</h3>
+                            <p>The brain is the command center of the central nervous system, processing sensory information and controlling bodily functions.</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>Key Regions</h3>
+                            <p>• Cerebrum: Higher cognitive functions<br>
+                            • Cerebellum: Motor control and balance<br>
+                            • Brainstem: Vital autonomic functions</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>Study Tips</h3>
+                            <p>Focus on understanding the functional connections between different brain regions for MCAT success.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Tools -->
+            <div class="study-tools">
+                <div class="tool-card" onclick="openFlashcards()">
+                    <div class="tool-icon">🎴</div>
+                    <div class="tool-name">Flashcards</div>
+                </div>
+                <div class="tool-card" onclick="openQuiz()">
+                    <div class="tool-icon">📝</div>
+                    <div class="tool-name">Quiz</div>
+                </div>
+                <div class="tool-card" onclick="openNotes()">
+                    <div class="tool-icon">📚</div>
+                    <div class="tool-name">Notes</div>
+                </div>
+                <div class="tool-card" onclick="openProgress()">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">Progress</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Flashcard Modal -->
+    <div class="modal" id="flashcardModal">
+        <div class="modal-content">
+            <h2>Neuroanatomy Flashcards</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 30%"></div>
+            </div>
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="flashcard-front">
+                    <h3>What is the function of the hippocampus?</h3>
+                </div>
+                <div class="flashcard-back">
+                    <p>The hippocampus is crucial for memory formation, particularly in converting short-term memories to long-term memories and spatial navigation.</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="nextCard()">Next Card</button>
+                <button class="btn" onclick="closeModal('flashcardModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div class="modal" id="quizModal">
+        <div class="modal-content">
+            <h2>Neuroanatomy Quiz</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 20%"></div>
+            </div>
+            <div class="quiz-question">
+                Which lobe of the brain is primarily responsible for visual processing?
+            </div>
+            <div class="quiz-options">
+                <div class="quiz-option" onclick="selectAnswer(this, false)">Frontal lobe</div>
+                <div class="quiz-option" onclick="selectAnswer(this, false)">Parietal lobe</div>
+                <div class="quiz-option" onclick="selectAnswer(this, true)">Occipital lobe</div>
+                <div class="quiz-option" onclick="selectAnswer(this, false)">Temporal lobe</div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="closeModal('quizModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <h2>Study Notes</h2>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <select class="search-box" style="flex: 1;">
+                    <option>All Notes</option>
+                    <option>Neuroanatomy</option>
+                    <option>Physiology</option>
+                    <option>Pathology</option>
+                </select>
+                <button class="btn btn-primary">+ New Note</button>
+            </div>
+            <div class="notes-list">
+                <div class="note-item" style="background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Neurotransmitters</h4>
+                    <p style="color: #6b7280; font-size: 0.875rem;">Dopamine: pleasure, reward, motor control. Serotonin: mood, sleep, appetite...</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <span style="font-size: 0.75rem; color: #9ca3af;">2 hours ago</span>
+                        <span style="font-size: 0.75rem; color: #2563eb;">• Neuroanatomy</span>
+                    </div>
+                </div>
+                <div class="note-item" style="background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Blood-Brain Barrier</h4>
+                    <p style="color: #6b7280; font-size: 0.875rem;">Selective permeability, protects CNS from toxins, formed by tight junctions...</p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <span style="font-size: 0.75rem; color: #9ca3af;">Yesterday</span>
+                        <span style="font-size: 0.75rem; color: #2563eb;">• Physiology</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="closeModal('notesModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2>Study Progress</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: #eff6ff; padding: 1.5rem; border-radius: 0.75rem; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #2563eb;">847</div>
+                    <div style="color: #6b7280;">Total Questions</div>
+                </div>
+                <div style="background: #d1fae5; padding: 1.5rem; border-radius: 0.75rem; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #10b981;">78%</div>
+                    <div style="color: #6b7280;">Accuracy Rate</div>
+                </div>
+                <div style="background: #fef3c7; padding: 1.5rem; border-radius: 0.75rem; text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #f59e0b;">12</div>
+                    <div style="color: #6b7280;">Day Streak</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom: 1rem;">System Mastery</h3>
+            <div class="system-progress">
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Nervous System</span>
+                        <span style="color: #2563eb;">85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%; background: #2563eb;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Cardiovascular</span>
+                        <span style="color: #10b981;">72%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 72%; background: #10b981;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Respiratory</span>
+                        <span style="color: #f59e0b;">45%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%; background: #f59e0b;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <canvas id="progressChart" width="400" height="200" style="margin-top: 2rem;"></canvas>
+            
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="closeModal('progressModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Three.js setup
+        let scene, camera, renderer, brain, isRotating = true;
+        let labels = [];
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf8f9fa);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('anatomyViewer'), antialias: true });
+            renderer.setSize(window.innerWidth - 300, window.innerHeight - 170);
+            renderer.shadowMap.enabled = true;
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Create brain model (simplified)
+            createBrainModel();
+
+            // Mouse controls
+            let mouseX = 0, mouseY = 0;
+            let targetRotationX = 0, targetRotationY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            animate();
+        }
+
+        function createBrainModel() {
+            // Create a simplified brain model using multiple spheres
+            const brainGroup = new THREE.Group();
+
+            // Main brain body
+            const brainGeometry = new THREE.SphereGeometry(2, 32, 32);
+            const brainMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffb6c1,
+                emissive: 0xff69b4,
+                emissiveIntensity: 0.1,
+                shininess: 100
+            });
+            
+            const brainMesh = new THREE.Mesh(brainGeometry, brainMaterial);
+            brainMesh.scale.set(1, 0.8, 0.9);
+            brainGroup.add(brainMesh);
+
+            // Add surface details
+            const detailGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            for (let i = 0; i < 20; i++) {
+                const detail = new THREE.Mesh(detailGeometry, brainMaterial);
+                detail.position.set(
+                    (Math.random() - 0.5) * 3,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2.5
+                );
+                brainGroup.add(detail);
+            }
+
+            // Cerebellum
+            const cerebellumGeometry = new THREE.SphereGeometry(0.8, 24, 24);
+            const cerebellumMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff9999,
+                emissive: 0xff6666,
+                emissiveIntensity: 0.1
+            });
+            const cerebellum = new THREE.Mesh(cerebellumGeometry, cerebellumMaterial);
+            cerebellum.position.set(0, -1.2, -0.8);
+            brainGroup.add(cerebellum);
+
+            // Brain stem
+            const stemGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1.5, 16);
+            const stemMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffaaaa,
+                emissive: 0xff7777,
+                emissiveIntensity: 0.1
+            });
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.set(0, -1.8, 0);
+            brainGroup.add(stem);
+
+            brain = brainGroup;
+            scene.add(brain);
+
+            // Add interactive regions
+            addInteractiveRegions();
+        }
+
+        function addInteractiveRegions() {
+            const regions = [
+                { name: 'Frontal Lobe', position: new THREE.Vector3(1, 0.5, 1) },
+                { name: 'Parietal Lobe', position: new THREE.Vector3(0, 1, 0) },
+                { name: 'Temporal Lobe', position: new THREE.Vector3(1.5, -0.5, 0) },
+                { name: 'Occipital Lobe', position: new THREE.Vector3(-1, 0, -1) },
+                { name: 'Cerebellum', position: new THREE.Vector3(0, -1.2, -0.8) }
+            ];
+
+            regions.forEach(region => {
+                const labelGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const labelMaterial = new THREE.MeshBasicMaterial({ color: 0x2563eb });
+                const labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
+                labelMesh.position.copy(region.position);
+                labelMesh.userData = { name: region.name };
+                brain.add(labelMesh);
+                labels.push(labelMesh);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (brain && isRotating) {
+                brain.rotation.y += 0.005;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function resetView() {
+            camera.position.set(0, 0, 5);
+            if (brain) {
+                brain.rotation.set(0, 0, 0);
+            }
+        }
+
+        function toggleRotation() {
+            isRotating = !isRotating;
+        }
+
+        function toggleLayers() {
+            if (brain) {
+                brain.children.forEach((child, index) => {
+                    child.visible = !child.visible;
+                });
+            }
+        }
+
+        function crossSection() {
+            // Simplified cross-section toggle
+            if (brain) {
+                brain.children.forEach(child => {
+                    if (child.position.z > 0) {
+                        child.visible = !child.visible;
+                    }
+                });
+            }
+        }
+
+        function toggleLabels() {
+            labels.forEach(label => {
+                label.visible = !label.visible;
+            });
+        }
+
+        function loadSystem(system) {
+            // Update active state
+            document.querySelectorAll('.system-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.system-item').classList.add('active');
+
+            // Load different anatomical systems
+            console.log(`Loading ${system} system...`);
+        }
+
+        function closeInfo() {
+            document.getElementById('infoPanel').style.display = 'none';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update content based on tab
+            const content = {
+                overview: '<div class="info-section"><h3>Central Nervous System</h3><p>The brain is the command center...</p></div>',
+                structure: '<div class="info-section"><h3>Anatomical Structure</h3><p>The brain consists of gray matter and white matter...</p></div>',
+                function: '<div class="info-section"><h3>Functional Areas</h3><p>Different regions control specific functions...</p></div>',
+                clinical: '<div class="info-section"><h3>Clinical Relevance</h3><p>Understanding brain anatomy is crucial for...</p></div>'
+            };
+            
+            document.getElementById('infoContent').innerHTML = content[tab];
+        }
+
+        function openFlashcards() {
+            document.getElementById('flashcardModal').classList.add('active');
+        }
+
+        function openQuiz() {
+            document.getElementById('quizModal').classList.add('active');
+        }
+
+        function openNotes() {
+            document.getElementById('notesModal').classList.add('active');
+        }
+
+        function openProgress() {
+            document.getElementById('progressModal').classList.add('active');
+            updateProgressCharts();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            // Simulate loading next card
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.remove('flipped');
+            setTimeout(() => {
+                flashcard.querySelector('.flashcard-front h3').textContent = 'What is the blood-brain barrier?';
+                flashcard.querySelector('.flashcard-back p').textContent = 'A selective semipermeable membrane barrier that separates circulating blood from brain tissue and the CNS.';
+            }, 300);
+        }
+
+        function selectAnswer(option, isCorrect) {
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.onclick = null;
+            });
+            
+            if (isCorrect) {
+                option.classList.add('correct');
+            } else {
+                option.classList.add('incorrect');
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = (window.innerWidth - 300) / (window.innerHeight - 170);
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth - 300, window.innerHeight - 170);
+        });
+
+        // Progress chart
+        function updateProgressCharts() {
+            const canvas = document.getElementById('progressChart');
+            if (canvas && canvas.getContext) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Simple line chart for weekly progress
+                ctx.strokeStyle = '#2563eb';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                const data = [65, 70, 68, 75, 78, 82, 78];
+                const spacing = canvas.width / (data.length - 1);
+                
+                data.forEach((value, index) => {
+                    const x = index * spacing;
+                    const y = canvas.height - (value / 100 * canvas.height);
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                    
+                    // Draw point
+                    ctx.fillStyle = '#2563eb';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                ctx.stroke();
+                
+                // Add labels
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '12px sans-serif';
+                ctx.fillText('Weekly Progress', 10, 20);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (e.key === 'f' && !e.target.matches('input')) {
+                openFlashcards();
+            }
+            
+            if (e.key === 'q' && !e.target.matches('input')) {
+                openQuiz();
+            }
+        });
+
+        // Touch gestures for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaX = touchEndX - touchStartX;
+            
+            if (Math.abs(deltaX) > 100) {
+                if (deltaX > 0) {
+                    // Swipe right - previous system
+                    console.log('Previous system');
+                } else {
+                    // Swipe left - next system
+                    console.log('Next system');
+                }
+            }
+        });
+
+        // Study session timer
+        let studyTime = 0;
+        let studyTimer = setInterval(() => {
+            studyTime++;
+            if (studyTime % 60 === 0) {
+                console.log(`Study time: ${Math.floor(studyTime / 60)} minutes`);
+            }
+        }, 1000);
+
+        // Save progress locally
+        function saveProgress(type, data) {
+            const progress = {
+                timestamp: new Date().toISOString(),
+                type: type,
+                data: data
+            };
+            console.log('Progress saved:', progress);
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
