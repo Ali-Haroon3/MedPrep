@@ -313,4 +313,28 @@ export interface DailyStat {
   topicsReviewed: string[];
 }
 
-export interface TopicPe
+export interface TopicPerformance {
+  topic: string;
+  questionsAnswered: number;
+  accuracy: number;
+  averageTime: number;
+  lastStudied: string;
+  trend: 'improving' | 'stable' | 'declining';
+}
+
+// WebSocket Types
+export interface WSMessage {
+  type: 'notification' | 'progress' | 'collaboration';
+  payload: any;
+  timestamp: string;
+}
+
+export interface Notification {
+  id: string;
+  type: 'achievement' | 'reminder' | 'system' | 'social';
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  actionUrl?: string;
+}
