@@ -151,7 +151,78 @@ const Dashboard: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="card"
+              className="card">
+              <div className="card-header">
+                <h2 className="text-lg font-semibold">Recent Activity</h2>
+                <Link to="/progress" className="text-blue-600 text-sm hover:underline">
+                  View All →
+                </Link>
+              </div>
+              <div className="card-body">
+                <div className="space-y-3">
+                  {recentActivity && recentActivity.length > 0 ? (
+                    recentActivity.slice(0, 5).map((activity: any, index: number) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center
+                          ${activity.type === 'quiz' ? 'bg-purple-100' : 
+                            activity.type === 'flashcard' ? 'bg-green-100' : 
+                            'bg-blue-100'}
+                        `}>
+                          {activity.type === 'quiz' ? <Target className="w-4 h-4 text-purple-600" /> :
+                           activity.type === 'flashcard' ? <Activity className="w-4 h-4 text-green-600" /> :
+                           <Brain className="w-4 h-4 text-blue-600" />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{activity.description}</p>
+                          <p className="text-xs text-gray-500">
+                            {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600 text-center py-4">
+                      No recent activity. Start studying to see your progress!
+                    </p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Upcoming Goals */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <UpcomingGoals />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Achievement Toast */}
+      {progress.totalQuestions > 0 && progress.totalQuestions % 100 === 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed bottom-4 right-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-lg shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <Award className="w-8 h-8" />
+            <div>
+              <h3 className="font-bold">Milestone Reached!</h3>
+              <p className="text-sm">{progress.totalQuestions} questions answered!</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
             >
               <div className="card-header">
                 <h2 className="text-xl font-semibold">Quick Start</h2>
