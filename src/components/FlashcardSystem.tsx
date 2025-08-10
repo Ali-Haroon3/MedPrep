@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 
 interface Flashcard {
   id: string;
@@ -7,43 +6,17 @@ interface Flashcard {
   back: string;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  lastReviewed: Date | null;
-  nextReview: Date | null;
-  reviewCount: number;
-  correctCount: number;
-  incorrectCount: number;
   tags: string[];
 }
 
-interface FlashcardSystemProps {
-  category?: string;
-}
-
-const FlashcardSystem: React.FC<FlashcardSystemProps> = ({ category = 'all' }) => {
-  const [cards, setCards] = useState<Flashcard[]>([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [studyMode, setStudyMode] = useState<'new' | 'review' | 'all'>('all');
-  const [stats, setStats] = useState({
-    totalCards: 0,
-    reviewedToday: 0,
-    correctToday: 0,
-    streak: 0
-  });
-
-  // Sample medical flashcards
-  const sampleCards = useMemo(() => [
+const FlashcardSystem: React.FC = () => {
+  const [cards] = useState<Flashcard[]>([
     {
       id: '1',
       front: 'What is the function of the sinoatrial (SA) node?',
       back: 'The SA node is the natural pacemaker of the heart, generating electrical impulses that initiate each heartbeat and control the heart rate.',
       category: 'Cardiology',
-      difficulty: 'medium' as const,
-      lastReviewed: null,
-      nextReview: null,
-      reviewCount: 0,
-      correctCount: 0,
-      incorrectCount: 0,
+      difficulty: 'medium',
       tags: ['heart', 'electrical', 'pacemaker']
     },
     {
@@ -51,12 +24,7 @@ const FlashcardSystem: React.FC<FlashcardSystemProps> = ({ category = 'all' }) =
       front: 'Define the term "myocardial infarction"',
       back: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow to the heart muscle is blocked, causing damage or death to the heart tissue.',
       category: 'Cardiology',
-      difficulty: 'hard' as const,
-      lastReviewed: null,
-      nextReview: null,
-      reviewCount: 0,
-      correctCount: 0,
-      incorrectCount: 0,
+      difficulty: 'hard',
       tags: ['heart attack', 'blood flow', 'tissue damage']
     },
     {
@@ -64,46 +32,15 @@ const FlashcardSystem: React.FC<FlashcardSystemProps> = ({ category = 'all' }) =
       front: 'What are the three main types of blood vessels?',
       back: 'Arteries (carry oxygenated blood away from heart), Veins (carry deoxygenated blood back to heart), and Capillaries (smallest vessels where gas exchange occurs).',
       category: 'Anatomy',
-      difficulty: 'easy' as const,
-      lastReviewed: null,
-      nextReview: null,
-      reviewCount: 0,
-      correctCount: 0,
-      incorrectCount: 0,
+      difficulty: 'easy',
       tags: ['blood vessels', 'circulation', 'gas exchange']
-    },
-    {
-      id: '4',
-      front: 'Explain the difference between systolic and diastolic blood pressure',
-      back: 'Systolic pressure is the pressure when the heart contracts (pumps blood), while diastolic pressure is the pressure when the heart relaxes (fills with blood).',
-      category: 'Physiology',
-      difficulty: 'medium' as const,
-      lastReviewed: null,
-      nextReview: null,
-      reviewCount: 0,
-      correctCount: 0,
-      incorrectCount: 0,
-      tags: ['blood pressure', 'heart cycle', 'pressure measurement']
-    },
-    {
-      id: '5',
-      front: 'What is the function of the cerebellum?',
-      back: 'The cerebellum coordinates voluntary movements, maintains balance and posture, and helps with motor learning and fine motor control.',
-      category: 'Neurology',
-      difficulty: 'medium' as const,
-      lastReviewed: null,
-      nextReview: null,
-      reviewCount: 0,
-      correctCount: 0,
-      incorrectCount: 0,
-      tags: ['brain', 'movement', 'coordination', 'balance']
     }
-  ], []);
+  ]);
 
-  useEffect(() => {
-    setCards(sampleCards);
-    setStats(prev => ({ ...prev, totalCards: sampleCards.length }));
-  }, [sampleCards]);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
 
   const currentCard = cards[currentCardIndex];
 
@@ -112,31 +49,11 @@ const FlashcardSystem: React.FC<FlashcardSystemProps> = ({ category = 'all' }) =
   };
 
   const handleAnswer = (wasCorrect: boolean) => {
-    if (!currentCard) return;
-
-    const updatedCards = [...cards];
-    const card = updatedCards[currentCardIndex];
-    
-    card.reviewCount++;
-    card.lastReviewed = new Date();
-    
     if (wasCorrect) {
-      card.correctCount++;
-      // Spaced repetition: increase interval for correct answers
-      const interval = Math.min(card.reviewCount * 2, 30); // Max 30 days
-      card.nextReview = new Date(Date.now() + interval * 24 * 60 * 60 * 1000);
+      setCorrectCount(prev => prev + 1);
     } else {
-      card.incorrectCount++;
-      // Reset interval for incorrect answers
-      card.nextReview = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day
+      setIncorrectCount(prev => prev + 1);
     }
-
-    setCards(updatedCards);
-    setStats(prev => ({
-      ...prev,
-      reviewedToday: prev.reviewedToday + 1,
-      correctToday: prev.correctToday + (wasCorrect ? 1 : 0)
-    }));
 
     // Move to next card
     setTimeout(() => {
@@ -150,262 +67,292 @@ const FlashcardSystem: React.FC<FlashcardSystemProps> = ({ category = 'all' }) =
   const resetSession = () => {
     setCurrentCardIndex(0);
     setIsFlipped(false);
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case 'medium': return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'hard': return 'bg-rose-100 text-rose-800 border-rose-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Cardiology': return '❤️';
-      case 'Anatomy': return '🫀';
-      case 'Physiology': return '🧬';
-      case 'Neurology': return '🧠';
-      case 'Pathology': return '🔬';
-      case 'Pharmacology': return '💊';
-      default: return '📚';
-    }
+    setCorrectCount(0);
+    setIncorrectCount(0);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#f3f4f6', 
+      padding: '2rem',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        
         {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
             Medical Flashcards
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Master medical concepts with intelligent spaced repetition and beautiful, interactive cards
+          <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+            Master medical concepts with spaced repetition
           </p>
-        </motion.div>
+        </div>
 
-        {/* Stats Bar */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="group">
-              <div className="text-3xl font-bold text-blue-600 group-hover:scale-110 transition-transform">
-                {stats.totalCards}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Total Cards</div>
-            </div>
-            <div className="group">
-              <div className="text-3xl font-bold text-emerald-600 group-hover:scale-110 transition-transform">
-                {stats.reviewedToday}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Reviewed Today</div>
-            </div>
-            <div className="group">
-              <div className="text-3xl font-bold text-purple-600 group-hover:scale-110 transition-transform">
-                {stats.correctToday}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Correct Today</div>
-            </div>
-            <div className="group">
-              <div className="text-3xl font-bold text-orange-600 group-hover:scale-110 transition-transform">
-                {stats.streak}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Day Streak</div>
-            </div>
-          </div>
-        </motion.div>
+        {/* Progress */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '2rem',
+          padding: '1rem',
+          backgroundColor: 'white',
+          borderRadius: '0.5rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <span style={{ color: '#6b7280' }}>
+            Card {currentCardIndex + 1} of {cards.length}
+          </span>
+          <span style={{ color: '#6b7280' }}>
+            {Math.round(((currentCardIndex + 1) / cards.length) * 100)}% complete
+          </span>
+        </div>
 
-        {/* Controls */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8"
-        >
-          <div className="flex flex-wrap gap-4 justify-center">
-            <button
-              onClick={() => setStudyMode('new')}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                studyMode === 'new' 
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              🆕 New Cards
-            </button>
-            <button
-              onClick={() => setStudyMode('review')}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                studyMode === 'review' 
-                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              🔄 Review Due
-            </button>
-            <button
-              onClick={() => setStudyMode('all')}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                studyMode === 'all' 
-                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              📚 All Cards
-            </button>
-            <button
-              onClick={resetSession}
-              className="px-6 py-3 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-200"
-            >
-              🔄 Reset Session
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Flashcard */}
+        {/* Main Flashcard */}
         {currentCard && (
-          <motion.div 
-            key={currentCardIndex}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8 mb-8"
-          >
-            {/* Progress */}
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600 font-medium">
-                  Card {currentCardIndex + 1} of {cards.length}
-                </span>
-                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
-                    style={{ width: `${((currentCardIndex + 1) / cards.length) * 100}%` }}
-                  />
+          <div style={{ marginBottom: '2rem' }}>
+            
+            {/* Flashcard */}
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '0.75rem',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              padding: '3rem',
+              textAlign: 'center',
+              cursor: 'pointer',
+              minHeight: '300px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #e5e7eb'
+            }} onClick={handleFlip}>
+              
+              <div>
+                <div style={{ 
+                  fontSize: '0.875rem', 
+                  color: '#6b7280', 
+                  marginBottom: '1rem',
+                  fontWeight: '500',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  {isFlipped ? 'ANSWER' : 'QUESTION'}
+                </div>
+                
+                <div style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: '600', 
+                  color: '#1f2937',
+                  lineHeight: '1.6',
+                  marginBottom: '1rem'
+                }}>
+                  {isFlipped ? currentCard.back : currentCard.front}
+                </div>
+
+                {isFlipped && currentCard.tags.length > 0 && (
+                  <div style={{ marginTop: '1.5rem' }}>
+                    {currentCard.tags.map((tag, index) => (
+                      <span key={index} style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        margin: '0.25rem',
+                        backgroundColor: '#dbeafe',
+                        color: '#1d4ed8',
+                        borderRadius: '9999px',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                      }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div style={{ 
+                  marginTop: '1.5rem', 
+                  fontSize: '0.875rem', 
+                  color: '#9ca3af' 
+                }}>
+                  Click to {isFlipped ? 'see question' : 'reveal answer'}
                 </div>
               </div>
-              <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getDifficultyColor(currentCard.difficulty)}`}>
-                {currentCard.difficulty}
-              </span>
             </div>
 
-            {/* Category */}
-            <div className="text-center mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 rounded-full text-sm font-semibold border border-blue-200">
-                <span className="text-lg">{getCategoryIcon(currentCard.category)}</span>
-                {currentCard.category}
-              </span>
-            </div>
-
-            {/* Card */}
-            <div className="relative h-96 mb-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={isFlipped ? 'back' : 'front'}
-                  initial={{ rotateY: isFlipped ? -90 : 90, opacity: 0 }}
-                  animate={{ rotateY: 0, opacity: 1 }}
-                  exit={{ rotateY: isFlipped ? 90 : -90, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 flex items-center justify-center cursor-pointer border-2 border-white/50 shadow-lg hover:shadow-xl transition-all duration-200"
-                  onClick={handleFlip}
-                >
-                  <div className="text-center max-w-2xl">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                      {isFlipped ? '💡 Answer' : '❓ Question'}
-                    </h3>
-                    <p className="text-xl text-gray-700 leading-relaxed font-medium">
-                      {isFlipped ? currentCard.back : currentCard.front}
-                    </p>
-                    {isFlipped && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-6"
-                      >
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          {currentCard.tags.map((tag: string, index: number) => (
-                            <span key={index} className="px-3 py-1 bg-white/70 text-gray-700 rounded-full text-sm font-medium border border-gray-200">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                    <div className="mt-6 text-sm text-gray-500">
-                      Click to {isFlipped ? 'see question' : 'reveal answer'}
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+            {/* Card Info */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              gap: '2rem',
+              marginTop: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>
+                  {currentCard.category === 'Cardiology' ? '❤️' : 
+                   currentCard.category === 'Anatomy' ? '🫀' : '📚'}
+                </span>
+                <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                  {currentCard.category}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  backgroundColor: currentCard.difficulty === 'easy' ? '#10b981' :
+                                   currentCard.difficulty === 'medium' ? '#f59e0b' : '#ef4444'
+                }}></div>
+                <span style={{ color: '#6b7280', fontSize: '0.875rem', textTransform: 'capitalize' }}>
+                  {currentCard.difficulty}
+                </span>
+              </div>
             </div>
 
             {/* Answer Buttons */}
             {isFlipped && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex gap-6 justify-center"
-              >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                gap: '1rem',
+                marginTop: '2rem'
+              }}>
                 <button
                   onClick={() => handleAnswer(false)}
-                  className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transform hover:scale-105"
+                  style={{
+                    padding: '0.75rem 2rem',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
                 >
                   ❌ Incorrect
                 </button>
                 <button
                   onClick={() => handleAnswer(true)}
-                  className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transform hover:scale-105"
+                  style={{
+                    padding: '0.75rem 2rem',
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
                 >
                   ✅ Correct
                 </button>
-              </motion.div>
-            )}
-
-            {/* Card Stats */}
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-6 bg-gray-50 rounded-xl px-6 py-3">
-                <span className="text-sm text-gray-600">
-                  <span className="font-semibold">Reviews:</span> {currentCard.reviewCount}
-                </span>
-                <span className="text-sm text-gray-600">
-                  <span className="font-semibold text-emerald-600">Correct:</span> {currentCard.correctCount}
-                </span>
-                <span className="text-sm text-gray-600">
-                  <span className="font-semibold text-red-600">Incorrect:</span> {currentCard.incorrectCount}
-                </span>
               </div>
-            </div>
-          </motion.div>
+            )}
+          </div>
         )}
+
+        {/* Stats */}
+        <div style={{ 
+          backgroundColor: 'white',
+          borderRadius: '0.5rem',
+          padding: '1.5rem',
+          marginBottom: '2rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gap: '1rem',
+            textAlign: 'center'
+          }}>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6' }}>
+                {cards.length}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Total Cards</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
+                {correctCount + incorrectCount}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Reviewed</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#8b5cf6' }}>
+                {correctCount}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Correct</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
+                {incorrectCount}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Incorrect</div>
+            </div>
+          </div>
+        </div>
 
         {/* Completion Message */}
         {currentCardIndex >= cards.length && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-12 text-center"
-          >
-            <div className="text-6xl mb-6">🎉</div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Session Complete!</h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
-              You've reviewed all cards in this session. Great job! Keep up the excellent work.
+          <div style={{ 
+            backgroundColor: 'white',
+            borderRadius: '0.75rem',
+            padding: '3rem',
+            textAlign: 'center',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
+              Session Complete!
+            </h2>
+            <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+              You've reviewed all cards in this session. Great job!
             </p>
             <button
               onClick={resetSession}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transform hover:scale-105"
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
             >
-              🔄 Start New Session
+              Start New Session
             </button>
-          </motion.div>
+          </div>
         )}
+
+        {/* Controls */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '1rem'
+        }}>
+          <button
+            onClick={resetSession}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer'
+            }}
+          >
+            Reset Session
+          </button>
+        </div>
+
       </div>
     </div>
   );
