@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import FlashcardSystem from './components/FlashcardSystem';
 
 function Navigation() {
   const location = useLocation();
@@ -33,13 +34,7 @@ function App() {
                 <p>Track your progress, view study statistics, and manage your learning goals.</p>
               </div>
             } />
-            <Route path="/study" element={
-              <div className="study-tools">
-                <h2>Study Tools</h2>
-                <p>Quiz and flashcard systems coming soon!</p>
-                <p>Practice with interactive quizzes and review with spaced repetition flashcards.</p>
-              </div>
-            } />
+            <Route path="/study" element={<FlashcardSystem />} />
             <Route path="/anatomy" element={
               <div className="anatomy">
                 <h2>3D Anatomy Viewer</h2>
