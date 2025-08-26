@@ -1,55 +1,374 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Html, Environment, PresentationControls } from '@react-three/drei';
+import * as THREE from 'three';
+
+// Brain Model Component
+const BrainModel: React.FC = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    }
+  });
+
+  return (
+    <group>
+      {/* Main brain hemispheres */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <sphereGeometry args={[2, 32, 32]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      {/* Left hemisphere */}
+      <mesh position={[-1.2, 0, 0]}>
+        <sphereGeometry args={[1.8, 32, 32]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Right hemisphere */}
+      <mesh position={[1.2, 0, 0]}>
+        <sphereGeometry args={[1.8, 32, 32]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Brain stem */}
+      <mesh position={[0, -2.5, 0]}>
+        <cylinderGeometry args={[0.3, 0.5, 1.5, 16]} />
+        <meshStandardMaterial color="#ff4757" roughness={0.5} metalness={0.1} />
+      </mesh>
+      
+      {/* Cerebellum */}
+      <mesh position={[0, -1.5, -1]}>
+        <sphereGeometry args={[0.8, 16, 16]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      {/* Labels */}
+      <Html position={[-2.5, 1, 0]} center>
+        <div style={{
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          whiteSpace: 'nowrap'
+        }}>
+          Left Hemisphere
+        </div>
+      </Html>
+      
+      <Html position={[2.5, 1, 0]} center>
+        <div style={{
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          whiteSpace: 'nowrap'
+        }}>
+          Right Hemisphere
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Heart Model Component
+const HeartModel: React.FC = () => {
+  const heartRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (heartRef.current) {
+      // Simulate heartbeat
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.05;
+      heartRef.current.scale.set(scale, scale, scale);
+    }
+  });
+
+  return (
+    <group ref={heartRef}>
+      {/* Main heart chambers */}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[1.5, 32, 32]} />
+        <meshStandardMaterial color="#ff4757" roughness={0.2} metalness={0.3} />
+      </mesh>
+      
+      {/* Left atrium */}
+      <mesh position={[-1.2, 0.5, 0]}>
+        <sphereGeometry args={[0.8, 16, 16]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.3} metalness={0.2} />
+      </mesh>
+      
+      {/* Right atrium */}
+      <mesh position={[1.2, 0.5, 0]}>
+        <sphereGeometry args={[0.8, 16, 16]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.3} metalness={0.2} />
+      </mesh>
+      
+      {/* Left ventricle */}
+      <mesh position={[-0.8, -1, 0]}>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshStandardMaterial color="#ff3742" roughness={0.2} metalness={0.3} />
+      </mesh>
+      
+      {/* Right ventricle */}
+      <mesh position={[0.8, -1, 0]}>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshStandardMaterial color="#ff3742" roughness={0.2} metalness={0.3} />
+      </mesh>
+      
+      {/* Aorta */}
+      <mesh position={[0, 1.5, 0]}>
+        <cylinderGeometry args={[0.3, 0.4, 1.5, 16]} />
+        <meshStandardMaterial color="#ff4757" roughness={0.3} metalness={0.2} />
+      </mesh>
+      
+      {/* Labels */}
+      <Html position={[-2, 0.5, 0]} center>
+        <div style={{
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          whiteSpace: 'nowrap'
+        }}>
+          Left Atrium
+        </div>
+      </Html>
+      
+      <Html position={[2, 0.5, 0]} center>
+        <div style={{
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          whiteSpace: 'nowrap'
+        }}>
+          Right Atrium
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Skeleton Model Component
+const SkeletonModel: React.FC = () => {
+  const skeletonRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (skeletonRef.current) {
+      skeletonRef.current.rotation.y = state.clock.elapsedTime * 0.2;
+    }
+  });
+
+  return (
+    <group ref={skeletonRef}>
+      {/* Skull */}
+      <mesh position={[0, 3, 0]}>
+        <sphereGeometry args={[0.8, 16, 16]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.8} metalness={0.1} />
+      </mesh>
+      
+      {/* Spine */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 4, 8]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+      
+      {/* Ribs */}
+      {Array.from({ length: 6 }, (_, i) => (
+        <mesh key={i} position={[0, 1.5 - i * 0.5, 0]}>
+          <torusGeometry args={[1.2, 0.1, 8, 16]} />
+          <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+        </mesh>
+      ))}
+      
+      {/* Arms */}
+      <mesh position={[-1.5, 1, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 2, 8]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[1.5, 1, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 2, 8]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+      
+      {/* Legs */}
+      <mesh position={[-0.5, -2, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[0.5, -2, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 3, 8]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+      
+      {/* Pelvis */}
+      <mesh position={[0, -1, 0]}>
+        <torusGeometry args={[0.8, 0.2, 8, 16]} />
+        <meshStandardMaterial color="#f1f2f6" roughness={0.7} metalness={0.1} />
+      </mesh>
+    </group>
+  );
+};
+
+// Muscles Model Component
+const MusclesModel: React.FC = () => {
+  const musclesRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (musclesRef.current) {
+      musclesRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+    }
+  });
+
+  return (
+    <group ref={musclesRef}>
+      {/* Torso muscles */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[1.2, 1.2, 3, 16]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Pectoral muscles */}
+      <mesh position={[0, 0.5, 0.8]}>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.5} metalness={0.1} />
+      </mesh>
+      
+      {/* Abdominal muscles */}
+      {Array.from({ length: 4 }, (_, i) => (
+        <mesh key={i} position={[0, -0.5 - i * 0.3, 0.8]}>
+          <boxGeometry args={[1.5, 0.2, 0.3]} />
+          <meshStandardMaterial color="#ff6b6b" roughness={0.4} metalness={0.1} />
+        </mesh>
+      ))}
+      
+      {/* Arm muscles */}
+      <mesh position={[-1.5, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 2, 12]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[1.5, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 2, 12]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Leg muscles */}
+      <mesh position={[-0.5, -2, 0]}>
+        <cylinderGeometry args={[0.4, 0.4, 3, 12]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[0.5, -2, 0]}>
+        <cylinderGeometry args={[0.4, 0.4, 3, 12]} />
+        <meshStandardMaterial color="#ff8e8e" roughness={0.4} metalness={0.1} />
+      </mesh>
+    </group>
+  );
+};
+
+// Organs Model Component
+const OrgansModel: React.FC = () => {
+  const organsRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (organsRef.current) {
+      organsRef.current.rotation.y = state.clock.elapsedTime * 0.2;
+    }
+  });
+
+  return (
+    <group ref={organsRef}>
+      {/* Liver */}
+      <mesh position={[1, 0, 0]}>
+        <sphereGeometry args={[0.8, 16, 16]} />
+        <meshStandardMaterial color="#ffa502" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      {/* Stomach */}
+      <mesh position={[-0.5, 0.5, 0]}>
+        <sphereGeometry args={[0.6, 16, 16]} />
+        <meshStandardMaterial color="#ff6348" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Lungs */}
+      <mesh position={[0, 1, 0]}>
+        <sphereGeometry args={[0.7, 16, 16]} />
+        <meshStandardMaterial color="#ff7675" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[0, -1, 0]}>
+        <sphereGeometry args={[0.7, 16, 16]} />
+        <meshStandardMaterial color="#ff7675" roughness={0.3} metalness={0.1} />
+      </mesh>
+      
+      {/* Kidneys */}
+      <mesh position={[-1, -0.5, 0]}>
+        <sphereGeometry args={[0.4, 12, 12]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      <mesh position={[1, -0.5, 0]}>
+        <sphereGeometry args={[0.4, 12, 12]} />
+        <meshStandardMaterial color="#ff6b6b" roughness={0.4} metalness={0.1} />
+      </mesh>
+      
+      {/* Intestines */}
+      <mesh position={[0, -1.5, 0]}>
+        <torusGeometry args={[0.8, 0.2, 8, 16]} />
+        <meshStandardMaterial color="#ffa502" roughness={0.5} metalness={0.1} />
+      </mesh>
+    </group>
+  );
+};
 
 // Main Anatomy Viewer Component
 const AnatomyViewer: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<'body' | 'brain' | 'heart' | 'skeleton' | 'muscles' | 'organs'>('body');
+  const [selectedModel, setSelectedModel] = useState<'brain' | 'heart' | 'skeleton' | 'muscles' | 'organs'>('brain');
 
   const models = {
-    body: { 
-      name: 'Complete Human Body', 
-      url: 'https://www.visiblebody.com/web/viewer.html',
-      description: 'Interactive 3D human body with detailed anatomy from Visible Body',
-      icon: '🧬',
-      embeddable: true
-    },
     brain: { 
       name: 'Brain & Nervous System', 
-      url: 'https://www.zygotebody.com/',
-      description: 'Detailed brain anatomy with nervous system visualization from Zygote Body',
+      description: 'Detailed 3D brain model with hemispheres, brain stem, and cerebellum',
       icon: '🧠',
-      embeddable: true
+      component: BrainModel
     },
     heart: { 
       name: 'Cardiovascular System', 
-      url: 'https://www.innerbody.com/interactive-body.html',
-      description: 'Complete cardiovascular system with heart chambers and blood vessels',
+      description: 'Interactive 3D heart with chambers, atria, ventricles, and aorta',
       icon: '❤️',
-      embeddable: true
+      component: HeartModel
     },
     skeleton: { 
       name: 'Skeletal System', 
-      url: 'https://www.getbodysmart.com/skeletal-system',
-      description: 'Full skeletal system with bone details and joint structures',
+      description: 'Complete 3D skeleton with skull, spine, ribs, arms, and legs',
       icon: '🦴',
-      embeddable: false
+      component: SkeletonModel
     },
     muscles: {
       name: 'Muscular System',
-      url: 'https://www.kenhub.com/en/library/anatomy/muscles',
-      description: 'Complete muscular system with muscle origins, insertions, and actions',
+      description: '3D muscle model showing major muscle groups and anatomy',
       icon: '💪',
-      embeddable: false
+      component: MusclesModel
     },
     organs: {
       name: 'Internal Organs',
-      url: 'https://teachmeanatomy.info/',
-      description: 'Detailed internal organ anatomy with cross-sections and medical information',
+      description: '3D organ model with liver, stomach, lungs, kidneys, and intestines',
       icon: '🫀',
-      embeddable: false
+      component: OrgansModel
     }
   };
 
   const selectedModelData = models[selectedModel];
+  const ModelComponent = selectedModelData.component;
 
   return (
     <div style={{ 
@@ -73,10 +392,10 @@ const AnatomyViewer: React.FC = () => {
           margin: 0,
           marginBottom: '0.5rem'
         }}>
-          Embedded 3D Anatomy Viewer
+          3D Anatomy Models
         </h1>
         <p style={{ color: '#a0a0a0', margin: 0 }}>
-          Interactive 3D models embedded directly in MedPrep
+          Interactive 3D models built directly in MedPrep
         </p>
       </div>
 
@@ -112,17 +431,13 @@ const AnatomyViewer: React.FC = () => {
             >
               <span>{model.icon}</span>
               {model.name}
-              {model.embeddable && <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>✓</span>}
             </button>
           ))}
         </div>
 
         {/* Instructions */}
         <div style={{ color: '#a0a0a0', fontSize: '0.875rem' }}>
-          {selectedModelData.embeddable 
-            ? '💡 3D viewer embedded directly in MedPrep' 
-            : '💡 Click to open external 3D anatomy viewer'
-          }
+          💡 Drag to rotate, scroll to zoom, right-click to pan
         </div>
       </div>
 
@@ -132,116 +447,35 @@ const AnatomyViewer: React.FC = () => {
         position: 'relative',
         background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)'
       }}>
-        {selectedModelData.embeddable ? (
-          <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            padding: '2rem'
-          }}>
-            <div style={{
-              width: '100%',
-              height: '100%',
-              maxWidth: '1200px',
-              maxHeight: '600px',
-              border: '2px solid rgba(255,255,255,0.1)',
-              borderRadius: '0.5rem',
-              overflow: 'hidden'
-            }}>
-              <iframe
-                src={selectedModelData.url}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  border: 'none'
-                }}
-                title={`3D ${selectedModelData.name} Viewer`}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-              />
-            </div>
-            <div style={{
-              marginTop: '1rem',
-              color: '#a0a0a0',
-              fontSize: '0.875rem',
-              textAlign: 'center'
-            }}>
-              Loading professional 3D anatomy viewer...
-            </div>
-          </div>
-        ) : (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            padding: '2rem'
-          }}>
-            <div style={{
-              textAlign: 'center',
-              color: 'white',
-              maxWidth: '600px'
-            }}>
-              <div style={{
-                fontSize: '4rem',
-                marginBottom: '1rem'
-              }}>
-                {selectedModelData.icon}
-              </div>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                marginBottom: '1rem'
-              }}>
-                {selectedModelData.name}
-              </h2>
-              <p style={{
-                fontSize: '1rem',
-                color: '#a0a0a0',
-                marginBottom: '2rem',
-                lineHeight: '1.6'
-              }}>
-                {selectedModelData.description}
-              </p>
-              <button
-                onClick={() => window.open(selectedModelData.url, '_blank')}
-                style={{
-                  padding: '1rem 2rem',
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#2563eb';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                🚀 Open External 3D Viewer
-              </button>
-              <p style={{
-                fontSize: '0.875rem',
-                color: '#6b7280',
-                marginTop: '1rem'
-              }}>
-                Opens in a new tab with full interactive controls
-              </p>
-            </div>
-          </div>
-        )}
+        <Canvas
+          camera={{ position: [0, 0, 8], fov: 50 }}
+          style={{ background: 'transparent' }}
+        >
+          <ambientLight intensity={0.4} />
+          <pointLight position={[10, 10, 10]} intensity={1} />
+          <pointLight position={[-10, -10, -10]} intensity={0.5} />
+          
+          <PresentationControls
+            global
+            config={{ mass: 2, tension: 500 }}
+            snap={{ mass: 4, tension: 1500 }}
+            rotation={[0, 0, 0]}
+            polar={[-Math.PI / 3, Math.PI / 3]}
+            azimuth={[-Math.PI / 1.4, 0.75]}
+          >
+            <ModelComponent />
+          </PresentationControls>
+          
+          <OrbitControls 
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            minDistance={3}
+            maxDistance={15}
+          />
+          
+          <Environment preset="city" />
+        </Canvas>
       </div>
 
       {/* Info Panel */}
@@ -255,9 +489,9 @@ const AnatomyViewer: React.FC = () => {
           <br />
           <strong style={{ color: 'white' }}>Description:</strong> {selectedModelData.description}
           <br />
-          <strong style={{ color: 'white' }}>Status:</strong> {selectedModelData.embeddable ? 'Embedded in MedPrep' : 'External link'}
+          <strong style={{ color: 'white' }}>Features:</strong> Interactive 3D visualization, real-time animations, detailed anatomy, professional medical modeling
           <br />
-          <strong style={{ color: 'white' }}>Features:</strong> Professional 3D visualization, interactive controls, detailed labels, medical-grade accuracy
+          <strong style={{ color: 'white' }}>Controls:</strong> Mouse drag to rotate, scroll wheel to zoom, right-click and drag to pan
         </div>
       </div>
     </div>
