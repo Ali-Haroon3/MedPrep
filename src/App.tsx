@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import FlashcardSystem from './components/FlashcardSystem';
+import AnatomyViewer from './components/AnatomyViewer';
 
 function Navigation() {
   const location = useLocation();
@@ -35,13 +36,7 @@ function App() {
               </div>
             } />
             <Route path="/study" element={<FlashcardSystem />} />
-            <Route path="/anatomy" element={
-              <div className="anatomy">
-                <h2>3D Anatomy Viewer</h2>
-                <p>Interactive anatomy models coming soon!</p>
-                <p>Explore detailed 3D models of human anatomy with interactive features.</p>
-              </div>
-            } />
+            <Route path="/anatomy" element={<AnatomyViewer />} />
           </Routes>
         </main>
       </div>
