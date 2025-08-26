@@ -9,37 +9,43 @@ const AnatomyViewer: React.FC = () => {
       name: 'Complete Human Body', 
       url: 'https://www.visiblebody.com/web/viewer.html',
       description: 'Interactive 3D human body with detailed anatomy from Visible Body',
-      icon: '🧬'
+      icon: '🧬',
+      embeddable: true
     },
     brain: { 
       name: 'Brain & Nervous System', 
       url: 'https://www.zygotebody.com/',
       description: 'Detailed brain anatomy with nervous system visualization from Zygote Body',
-      icon: '🧠'
+      icon: '🧠',
+      embeddable: true
     },
     heart: { 
       name: 'Cardiovascular System', 
       url: 'https://www.innerbody.com/interactive-body.html',
       description: 'Complete cardiovascular system with heart chambers and blood vessels',
-      icon: '❤️'
+      icon: '❤️',
+      embeddable: true
     },
     skeleton: { 
       name: 'Skeletal System', 
       url: 'https://www.getbodysmart.com/skeletal-system',
       description: 'Full skeletal system with bone details and joint structures',
-      icon: '🦴'
+      icon: '🦴',
+      embeddable: false
     },
     muscles: {
       name: 'Muscular System',
       url: 'https://www.kenhub.com/en/library/anatomy/muscles',
       description: 'Complete muscular system with muscle origins, insertions, and actions',
-      icon: '💪'
+      icon: '💪',
+      embeddable: false
     },
     organs: {
       name: 'Internal Organs',
       url: 'https://teachmeanatomy.info/',
       description: 'Detailed internal organ anatomy with cross-sections and medical information',
-      icon: '🫀'
+      icon: '🫀',
+      embeddable: false
     }
   };
 
@@ -67,10 +73,10 @@ const AnatomyViewer: React.FC = () => {
           margin: 0,
           marginBottom: '0.5rem'
         }}>
-          Professional 3D Anatomy Viewer
+          Embedded 3D Anatomy Viewer
         </h1>
         <p style={{ color: '#a0a0a0', margin: 0 }}>
-          High-quality interactive 3D models from leading medical visualization platforms
+          Interactive 3D models embedded directly in MedPrep
         </p>
       </div>
 
@@ -106,13 +112,17 @@ const AnatomyViewer: React.FC = () => {
             >
               <span>{model.icon}</span>
               {model.name}
+              {model.embeddable && <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>✓</span>}
             </button>
           ))}
         </div>
 
         {/* Instructions */}
         <div style={{ color: '#a0a0a0', fontSize: '0.875rem' }}>
-          💡 Click to open professional 3D anatomy viewer in new tab
+          {selectedModelData.embeddable 
+            ? '💡 3D viewer embedded directly in MedPrep' 
+            : '💡 Click to open external 3D anatomy viewer'
+          }
         </div>
       </div>
 
@@ -120,71 +130,118 @@ const AnatomyViewer: React.FC = () => {
       <div style={{ 
         flex: 1, 
         position: 'relative',
-        background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem'
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)'
       }}>
-        <div style={{
-          textAlign: 'center',
-          color: 'white',
-          maxWidth: '600px'
-        }}>
+        {selectedModelData.embeddable ? (
           <div style={{
-            fontSize: '4rem',
-            marginBottom: '1rem'
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            padding: '2rem'
           }}>
-            {selectedModelData.icon}
-          </div>
-          <h2 style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem'
-          }}>
-            {selectedModelData.name}
-          </h2>
-          <p style={{
-            fontSize: '1rem',
-            color: '#a0a0a0',
-            marginBottom: '2rem',
-            lineHeight: '1.6'
-          }}>
-            {selectedModelData.description}
-          </p>
-          <button
-            onClick={() => window.open(selectedModelData.url, '_blank')}
-            style={{
-              padding: '1rem 2rem',
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              border: 'none',
+            <div style={{
+              width: '100%',
+              height: '100%',
+              maxWidth: '1200px',
+              maxHeight: '600px',
+              border: '2px solid rgba(255,255,255,0.1)',
               borderRadius: '0.5rem',
-              fontSize: '1rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#2563eb';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#3b82f6';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            🚀 Open Professional 3D Viewer
-          </button>
-          <p style={{
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            marginTop: '1rem'
+              overflow: 'hidden'
+            }}>
+              <iframe
+                src={selectedModelData.url}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none'
+                }}
+                title={`3D ${selectedModelData.name} Viewer`}
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              />
+            </div>
+            <div style={{
+              marginTop: '1rem',
+              color: '#a0a0a0',
+              fontSize: '0.875rem',
+              textAlign: 'center'
+            }}>
+              Loading professional 3D anatomy viewer...
+            </div>
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            padding: '2rem'
           }}>
-            Opens in a new tab with full interactive controls
-          </p>
-        </div>
+            <div style={{
+              textAlign: 'center',
+              color: 'white',
+              maxWidth: '600px'
+            }}>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1rem'
+              }}>
+                {selectedModelData.icon}
+              </div>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                {selectedModelData.name}
+              </h2>
+              <p style={{
+                fontSize: '1rem',
+                color: '#a0a0a0',
+                marginBottom: '2rem',
+                lineHeight: '1.6'
+              }}>
+                {selectedModelData.description}
+              </p>
+              <button
+                onClick={() => window.open(selectedModelData.url, '_blank')}
+                style={{
+                  padding: '1rem 2rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                🚀 Open External 3D Viewer
+              </button>
+              <p style={{
+                fontSize: '0.875rem',
+                color: '#6b7280',
+                marginTop: '1rem'
+              }}>
+                Opens in a new tab with full interactive controls
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Info Panel */}
@@ -198,9 +255,9 @@ const AnatomyViewer: React.FC = () => {
           <br />
           <strong style={{ color: 'white' }}>Description:</strong> {selectedModelData.description}
           <br />
-          <strong style={{ color: 'white' }}>Features:</strong> Professional 3D visualization, interactive controls, detailed labels, medical-grade accuracy
+          <strong style={{ color: 'white' }}>Status:</strong> {selectedModelData.embeddable ? 'Embedded in MedPrep' : 'External link'}
           <br />
-          <strong style={{ color: 'white' }}>Sources:</strong> Visible Body, Zygote Body, InnerBody, GetBodySmart, Kenhub, TeachMeAnatomy - Industry-leading medical visualization platforms
+          <strong style={{ color: 'white' }}>Features:</strong> Professional 3D visualization, interactive controls, detailed labels, medical-grade accuracy
         </div>
       </div>
     </div>
