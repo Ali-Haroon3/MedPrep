@@ -1,472 +1,49 @@
-import React, { useState, useEffect } from 'react';
-
-// Brain Model Component
-const BrainModel: React.FC = () => {
-  const [rotation, setRotation] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 1) % 360);
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div style={{
-      perspective: '1000px',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        transform: `rotateY(${rotation}deg)`,
-        transformStyle: 'preserve-3d',
-        position: 'relative',
-        width: '300px',
-        height: '300px',
-        transition: 'transform 0.1s ease-out'
-      }}>
-        {/* Main brain structure */}
-        <div style={{
-          position: 'absolute',
-          width: '200px',
-          height: '200px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff6b6b, #ff4757)',
-          boxShadow: '0 10px 30px rgba(255, 107, 107, 0.3)',
-          transform: 'translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        }}>
-          Brain
-        </div>
-        
-        {/* Left hemisphere */}
-        <div style={{
-          position: 'absolute',
-          width: '120px',
-          height: '120px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff8e8e, #ff6b6b)',
-          left: '-60px',
-          top: '40px',
-          transform: 'translateZ(20px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '12px',
-          fontWeight: 'bold'
-        }}>
-          Left
-        </div>
-        
-        {/* Right hemisphere */}
-        <div style={{
-          position: 'absolute',
-          width: '120px',
-          height: '120px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff8e8e, #ff6b6b)',
-          right: '-60px',
-          top: '40px',
-          transform: 'translateZ(20px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '12px',
-          fontWeight: 'bold'
-        }}>
-          Right
-        </div>
-        
-        {/* Brain stem */}
-        <div style={{
-          position: 'absolute',
-          width: '40px',
-          height: '80px',
-          background: 'linear-gradient(to bottom, #ff4757, #ff3742)',
-          borderRadius: '20px',
-          bottom: '-40px',
-          left: '50%',
-          transform: 'translateX(-50%) translateZ(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          Stem
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Heart Model Component
-const HeartModel: React.FC = () => {
-  const [beat, setBeat] = useState(1);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBeat(prev => prev === 1 ? 1.1 : 1);
-    }, 800);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div style={{
-      perspective: '1000px',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        transform: `scale(${beat})`,
-        transformStyle: 'preserve-3d',
-        position: 'relative',
-        width: '300px',
-        height: '300px',
-        transition: 'transform 0.2s ease-in-out'
-      }}>
-        {/* Main heart chambers */}
-        <div style={{
-          position: 'absolute',
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff4757, #ff3742)',
-          boxShadow: '0 10px 30px rgba(255, 71, 87, 0.3)',
-          transform: 'translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        }}>
-          Heart
-        </div>
-        
-        {/* Left atrium */}
-        <div style={{
-          position: 'absolute',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff6b6b, #ff4757)',
-          left: '-40px',
-          top: '20px',
-          transform: 'translateZ(20px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          LA
-        </div>
-        
-        {/* Right atrium */}
-        <div style={{
-          position: 'absolute',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff6b6b, #ff4757)',
-          right: '-40px',
-          top: '20px',
-          transform: 'translateZ(20px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          RA
-        </div>
-        
-        {/* Left ventricle */}
-        <div style={{
-          position: 'absolute',
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff3742, #ff1e3a)',
-          left: '-30px',
-          bottom: '20px',
-          transform: 'translateZ(15px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          LV
-        </div>
-        
-        {/* Right ventricle */}
-        <div style={{
-          position: 'absolute',
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #ff3742, #ff1e3a)',
-          right: '-30px',
-          bottom: '20px',
-          transform: 'translateZ(15px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          RV
-        </div>
-        
-        {/* Aorta */}
-        <div style={{
-          position: 'absolute',
-          width: '40px',
-          height: '60px',
-          background: 'linear-gradient(to bottom, #ff6b6b, #ff4757)',
-          borderRadius: '20px',
-          bottom: '-30px',
-          left: '50%',
-          transform: 'translateX(-50%) translateZ(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          Aorta
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Skeleton Model Component
-const SkeletonModel: React.FC = () => {
-  const [rotation, setRotation] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 0.5) % 360);
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div style={{
-      perspective: '1000px',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        transform: `rotateY(${rotation}deg)`,
-        transformStyle: 'preserve-3d',
-        position: 'relative',
-        width: '300px',
-        height: '400px',
-        transition: 'transform 0.1s ease-out'
-      }}>
-        {/* Skull */}
-        <div style={{
-          position: 'absolute',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #f1f2f6, #e9ecef)',
-          boxShadow: '0 5px 15px rgba(241, 242, 246, 0.3)',
-          top: '0px',
-          left: '50%',
-          transform: 'translateX(-50%) translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '12px',
-          fontWeight: 'bold'
-        }}>
-          Skull
-        </div>
-        
-        {/* Spine */}
-        <div style={{
-          position: 'absolute',
-          width: '20px',
-          height: '200px',
-          background: 'linear-gradient(to bottom, #f1f2f6, #e9ecef)',
-          borderRadius: '10px',
-          top: '80px',
-          left: '50%',
-          transform: 'translateX(-50%) translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          Spine
-        </div>
-        
-        {/* Ribs */}
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} style={{
-            position: 'absolute',
-            width: '120px',
-            height: '4px',
-            background: 'linear-gradient(to right, #f1f2f6, #e9ecef)',
-            borderRadius: '2px',
-            top: `${100 + i * 20}px`,
-            left: '50%',
-            transform: `translateX(-50%) translateZ(${10 + i * 2}px)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#495057',
-            fontSize: '8px',
-            fontWeight: 'bold'
-          }}>
-            Rib {i + 1}
-          </div>
-        ))}
-        
-        {/* Arms */}
-        <div style={{
-          position: 'absolute',
-          width: '15px',
-          height: '100px',
-          background: 'linear-gradient(to bottom, #f1f2f6, #e9ecef)',
-          borderRadius: '7.5px',
-          top: '120px',
-          left: '60px',
-          transform: 'translateZ(5px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '8px',
-          fontWeight: 'bold'
-        }}>
-          Arm
-        </div>
-        
-        <div style={{
-          position: 'absolute',
-          width: '15px',
-          height: '100px',
-          background: 'linear-gradient(to bottom, #f1f2f6, #e9ecef)',
-          borderRadius: '7.5px',
-          top: '120px',
-          right: '60px',
-          transform: 'translateZ(5px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '8px',
-          fontWeight: 'bold'
-        }}>
-          Arm
-        </div>
-        
-        {/* Legs */}
-        <div style={{
-          position: 'absolute',
-          width: '20px',
-          height: '150px',
-          background: 'linear-gradient(to bottom, #f1f2f6, #e9ecef)',
-          borderRadius: '10px',
-          top: '280px',
-          left: '40%',
-          transform: 'translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '8px',
-          fontWeight: 'bold'
-        }}>
-          Leg
-        </div>
-        
-        <div style={{
-          position: 'absolute',
-          width: '20px',
-          height: '150px',
-          background: 'linear-gradient(to bottom, #f1f2f6, #e9ecef)',
-          borderRadius: '10px',
-          top: '280px',
-          right: '40%',
-          transform: 'translateZ(0px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '8px',
-          fontWeight: 'bold'
-        }}>
-          Leg
-        </div>
-        
-        {/* Pelvis */}
-        <div style={{
-          position: 'absolute',
-          width: '100px',
-          height: '20px',
-          background: 'linear-gradient(to right, #f1f2f6, #e9ecef)',
-          borderRadius: '10px',
-          top: '260px',
-          left: '50%',
-          transform: 'translateX(-50%) translateZ(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#495057',
-          fontSize: '10px',
-          fontWeight: 'bold'
-        }}>
-          Pelvis
-        </div>
-      </div>
-    </div>
-  );
-};
+import React, { useState } from 'react';
 
 // Main Anatomy Viewer Component
 const AnatomyViewer: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<'brain' | 'heart' | 'skeleton'>('brain');
-  const [isAnimating, setIsAnimating] = useState(true);
+  const [selectedModel, setSelectedModel] = useState<'body' | 'brain' | 'heart' | 'skeleton' | 'muscles' | 'organs'>('body');
 
   const models = {
-    brain: { name: 'Brain', component: BrainModel, color: '#ff6b6b', description: 'Interactive 3D brain model with hemispheres and brain stem' },
-    heart: { name: 'Heart', component: HeartModel, color: '#ff4757', description: 'Beating heart model with all four chambers and aorta' },
-    skeleton: { name: 'Skeleton', component: SkeletonModel, color: '#f1f2f6', description: 'Complete skeletal system with bones and joints' }
+    body: { 
+      name: 'Complete Human Body', 
+      url: 'https://www.visiblebody.com/web/viewer.html',
+      description: 'Interactive 3D human body with detailed anatomy from Visible Body',
+      icon: '🧬'
+    },
+    brain: { 
+      name: 'Brain & Nervous System', 
+      url: 'https://www.zygotebody.com/',
+      description: 'Detailed brain anatomy with nervous system visualization from Zygote Body',
+      icon: '🧠'
+    },
+    heart: { 
+      name: 'Cardiovascular System', 
+      url: 'https://www.innerbody.com/interactive-body.html',
+      description: 'Complete cardiovascular system with heart chambers and blood vessels',
+      icon: '❤️'
+    },
+    skeleton: { 
+      name: 'Skeletal System', 
+      url: 'https://www.getbodysmart.com/skeletal-system',
+      description: 'Full skeletal system with bone details and joint structures',
+      icon: '🦴'
+    },
+    muscles: {
+      name: 'Muscular System',
+      url: 'https://www.kenhub.com/en/library/anatomy/muscles',
+      description: 'Complete muscular system with muscle origins, insertions, and actions',
+      icon: '💪'
+    },
+    organs: {
+      name: 'Internal Organs',
+      url: 'https://teachmeanatomy.info/',
+      description: 'Detailed internal organ anatomy with cross-sections and medical information',
+      icon: '🫀'
+    }
   };
 
-  const SelectedModelComponent = models[selectedModel].component;
+  const selectedModelData = models[selectedModel];
 
   return (
     <div style={{ 
@@ -490,10 +67,10 @@ const AnatomyViewer: React.FC = () => {
           margin: 0,
           marginBottom: '0.5rem'
         }}>
-          3D Anatomy Viewer
+          Professional 3D Anatomy Viewer
         </h1>
         <p style={{ color: '#a0a0a0', margin: 0 }}>
-          Interactive 3D models for medical education
+          High-quality interactive 3D models from leading medical visualization platforms
         </p>
       </div>
 
@@ -507,48 +84,35 @@ const AnatomyViewer: React.FC = () => {
         flexWrap: 'wrap'
       }}>
         {/* Model Selector */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {Object.entries(models).map(([key, model]) => (
             <button
               key={key}
               onClick={() => setSelectedModel(key as any)}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: selectedModel === key ? model.color : 'rgba(255,255,255,0.1)',
+                backgroundColor: selectedModel === key ? '#3b82f6' : 'rgba(255,255,255,0.1)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
               }}
             >
+              <span>{model.icon}</span>
               {model.name}
             </button>
           ))}
         </div>
 
-        {/* Animation Toggle */}
-        <button
-          onClick={() => setIsAnimating(!isAnimating)}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: isAnimating ? '#10b981' : 'rgba(255,255,255,0.1)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            fontWeight: '500'
-          }}
-        >
-          {isAnimating ? '⏸️ Pause Animation' : '▶️ Start Animation'}
-        </button>
-
         {/* Instructions */}
         <div style={{ color: '#a0a0a0', fontSize: '0.875rem' }}>
-          💡 Watch the 3D models rotate and animate automatically
+          💡 Click to open professional 3D anatomy viewer in new tab
         </div>
       </div>
 
@@ -559,20 +123,68 @@ const AnatomyViewer: React.FC = () => {
         background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        padding: '2rem'
       }}>
-        {isAnimating ? (
-          <SelectedModelComponent />
-        ) : (
+        <div style={{
+          textAlign: 'center',
+          color: 'white',
+          maxWidth: '600px'
+        }}>
           <div style={{
-            color: 'white',
-            fontSize: '1.2rem',
-            textAlign: 'center',
-            padding: '2rem'
+            fontSize: '4rem',
+            marginBottom: '1rem'
           }}>
-            Animation paused. Click "Start Animation" to resume.
+            {selectedModelData.icon}
           </div>
-        )}
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem'
+          }}>
+            {selectedModelData.name}
+          </h2>
+          <p style={{
+            fontSize: '1rem',
+            color: '#a0a0a0',
+            marginBottom: '2rem',
+            lineHeight: '1.6'
+          }}>
+            {selectedModelData.description}
+          </p>
+          <button
+            onClick={() => window.open(selectedModelData.url, '_blank')}
+            style={{
+              padding: '1rem 2rem',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#2563eb';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#3b82f6';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            🚀 Open Professional 3D Viewer
+          </button>
+          <p style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginTop: '1rem'
+          }}>
+            Opens in a new tab with full interactive controls
+          </p>
+        </div>
       </div>
 
       {/* Info Panel */}
@@ -582,11 +194,13 @@ const AnatomyViewer: React.FC = () => {
         borderTop: '1px solid rgba(255,255,255,0.1)'
       }}>
         <div style={{ color: '#a0a0a0', fontSize: '0.875rem' }}>
-          <strong style={{ color: 'white' }}>Current Model:</strong> {models[selectedModel].name}
+          <strong style={{ color: 'white' }}>Current Model:</strong> {selectedModelData.name}
           <br />
-          <strong style={{ color: 'white' }}>Description:</strong> {models[selectedModel].description}
+          <strong style={{ color: 'white' }}>Description:</strong> {selectedModelData.description}
           <br />
-          <strong style={{ color: 'white' }}>Features:</strong> CSS 3D transforms, smooth animations, realistic lighting effects
+          <strong style={{ color: 'white' }}>Features:</strong> Professional 3D visualization, interactive controls, detailed labels, medical-grade accuracy
+          <br />
+          <strong style={{ color: 'white' }}>Sources:</strong> Visible Body, Zygote Body, InnerBody, GetBodySmart, Kenhub, TeachMeAnatomy - Industry-leading medical visualization platforms
         </div>
       </div>
     </div>
