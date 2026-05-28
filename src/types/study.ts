@@ -60,3 +60,21 @@ export interface Note {
   tags: string[];
 }
 
+
+// --- Spaced repetition scheduling (added for SM-2 support) ---
+
+export interface CardSchedule {
+  cardId: string;
+  repetitions: number;
+  easeFactor: number;
+  interval: number;
+  dueDate: string; // ISO date the card is next due for review
+  lastQuality?: number;
+}
+
+export interface ReviewLog {
+  cardId: string;
+  reviewedAt: string; // ISO timestamp
+  quality: number; // 0-5 recall quality
+  intervalAfter: number;
+}
