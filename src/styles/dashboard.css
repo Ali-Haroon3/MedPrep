@@ -1,0 +1,48 @@
+.dashboard {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.dashboard h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.dashboard .study-timer {
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 1rem 0.75rem;
+  }
+  .dashboard .study-timer .study-timer__display,
+  .dashboard .study-timer div:first-child {
+    font-size: 2rem;
+  }
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--text-muted, #64748b);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+}
+
+nav a.active {
+  color: var(--accent-contrast, #fff);
+  background: var(--accent, #2563eb);
+}
